@@ -1,0 +1,104 @@
+<html>
+  <head>
+    <title></title>
+    <meta content="">
+	<link rel="stylesheet" type="text/css" href="imgnotes.css" >
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="jquery.imgareaselect-0.4.js"></script>
+	<script type="text/javascript" src="jquery.imgnotes.js"></script>
+
+	<script type="text/javascript">
+
+    mynotes = [{"x1":"10","y1":"10","height":"150","width":"50","note":"This is a note"}, {"x1":"25","y1":"25","height":"70","width":"80","note":"<b>This</b> is a new note This is another note This is a new note"}];
+
+	$(window).load(function () {
+        // somecode to detect mobile/touch devices, it is better
+        // to use WURFL on server for this
+        // Ref: http://roughlybrilliant.com/jquery_mobile_best_practices
+        if( ('querySelector' in document
+             && 'localStorage' in window
+             && 'addEventListener' in window
+             && ('ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch)
+             )
+             || navigator.userAgent.indexOf('IEMobile') > 0){
+
+                var thisIsMobile = true;
+        }
+
+        //If your notes data is comming from a URL pass the URL like
+		//$('#tern').imgNotes({url: "./json.html"});
+
+
+        //If your notes data is in the same scrip but is not named notes pass it
+        //Setting isMObile to true overlays an icon to toggle the notes, useful in touch devices
+        $('#tern').imgNotes({notes: mynotes, isMobile:thisIsMobile});
+
+        // example of how to use the showAll/hideAll functions
+        $('#shownotelink').toggle(
+            function(){
+                $('#tern').imgNotes.showAll();
+                return false;
+            },
+            function() {
+                $('#tern').imgNotes.hideAll();
+                return false;
+            }
+        );
+
+        //The following code is not a part of Image-notes plugin but added to show how to code the add notes functionality using the imgareaselect plugin
+		$('#cancelnote').click(function(){
+			$('#tern').imgAreaSelect({ hide: true, disable:true });
+			$('#noteform').hide();
+		});
+
+		$('#addnotelink').click(function(){
+			$('#tern').imgAreaSelect({ enable:true, onSelectChange: showaddnote, x1: 120, y1: 90, x2: 280, y2: 210 });
+			return false;
+		});
+
+
+	});
+
+	function showaddnote(img, area){
+		imgOffset = $(img).offset();
+		form_left  = parseInt(imgOffset.left) + parseInt(area.x1);
+		form_top   = parseInt(imgOffset.top) + parseInt(area.y1) + parseInt(area.height)+5;
+
+		$('#noteform').css({ left: form_left + 'px', top: form_top + 'px'});
+
+		$('#noteform').show();
+
+		$('#noteform').css("z-index", 10000);
+		$('#NoteX1').val(area.x1);
+		$('#NoteY1').val(area.y1);
+		$('#NoteHeight').val(area.height);
+		$('#NoteWidth').val(area.width);
+
+	}
+	</script>
+  </head>
+  <body>
+	<div style="text-align: center;">
+	<img tyle="margin: auto;" id="tern" src="tern.jpg" alt="A clear blue sky for me to fly" title="A clear blue sky for me to fly" />
+	</div>
+    <a href="#" id='shownotelink' >Show/Hide notes</a>
+
+    <a href="#" id='addnotelink' >Add a note</a>
+    <p><a href="http://www.sanisoft.com/blog/2009/01/23/img-notes-v02-a-couple-of-bug-fixes-and-some-more/" >Back to blog post</a></p>
+   <!-- The rest is not a part of Image-notes plugin but added to help coding the addNotes function -->
+
+	<div id="noteform" >
+	<form id="NoteAddForm" method="post" action="/nagpurbirds2/notes/add">
+		<fieldset>
+		<legend>Add Note</legend>
+		<input name="data[Note][x1]" type="hidden" value="" id="NoteX1" />
+		<input name="data[Note][y1]" type="hidden" value="" id="NoteY1" />
+		<input name="data[Note][height]" type="hidden" value="" id="NoteHeight" />
+		<input name="data[Note][width]" type="hidden" value="" id="NoteWidth" />
+		<textarea name="data[Note][note]" id="NoteNote" /></textarea>
+		</fieldset>
+		<div class="submit"><input type="submit" value="Submit" /> &nbsp;&nbsp;&nbsp;<input type="button" value="Cancel" id="cancelnote" ></div>
+		</form>
+	</div>
+  </body>
+</html>
